@@ -1,0 +1,29 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="EvolutionSimulator"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.2", "C#", "Mobile")
+config/icon="res://Icon.svg"
+
+[display]
+
+window/stretch/mode="viewport"
+window/vsync/vsync_mode=2
+
+[dotnet]
+
+project/assembly_name="EvolutionSimulator"
+
+[rendering]
+
+renderer/rendering_method="mobile"
