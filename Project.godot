@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="EvolutionSimulator"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
-config/icon="res://Icon.svg"
+config/icon="res://Assets/Icon.svg"
 
 [display]
 
 window/stretch/mode="viewport"
+window/stretch/aspect="keep_width"
 window/vsync/vsync_mode=2
 
 [dotnet]
