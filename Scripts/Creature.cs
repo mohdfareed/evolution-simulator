@@ -3,12 +3,18 @@ using Godot;
 namespace Scripts;
 public partial class Creature : CharacterBody2D
 {
-    private float _speed = 250;
+    [Export]
+    public float Acceleration = 15f;
+
+    private float _speed = 1.5f;
+
+    private Vector2 _velocity = Vector2.Zero;
 
 
     public override void _Process(double delta)
     {
-        Velocity = Velocity.Lerp(CalculateVelocity(), 0.2f);
+        var velocity = _velocity * SimulationManager.Instance.PixelsPerMeter;
+        Velocity = Velocity.Lerp(velocity, (float)delta * Acceleration);
         Rotate(Vector2.Zero.DirectionTo(Velocity).Angle() - GlobalRotation + Mathf.Pi / 2);
         MoveAndSlide();
     }
@@ -21,9 +27,9 @@ public partial class Creature : CharacterBody2D
         }
     }
 
-    public Vector2 CalculateVelocity()
+    public override void _Input(InputEvent @event)
     {
         Vector2 inputDir = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-        return inputDir.Normalized() * _speed;
+        _velocity = inputDir.Normalized() * _speed;
     }
 }

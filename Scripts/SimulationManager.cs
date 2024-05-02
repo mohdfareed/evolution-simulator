@@ -3,8 +3,9 @@ using Godot;
 namespace Scripts;
 public partial class SimulationManager : Node2D
 {
-    public Camera MainCamera { get; private set; }
+    [Export] public float PixelsPerMeter = 100f;
 
+    public Camera MainCamera { get; private set; }
     public static SimulationManager Instance { get; private set; }
 
 
