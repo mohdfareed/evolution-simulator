@@ -1,5 +1,9 @@
 {
     "recommendations": [
-        "ms-dotnettools.csdevkit"
+        "ms-dotnettools.csdevkit",
+        "editorconfig.editorconfig",
+        "geequlim.godot-tools",
+        "neikeq.godot-csharp-vscode",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
