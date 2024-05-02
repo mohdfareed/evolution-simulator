@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpsee5q1emeqc"]
+[gd_scene load_steps=5 format=3 uid="uid://cpsee5q1emeqc"]
 
 [ext_resource type="Script" path="res://Scripts/SimulationManager.cs" id="1_3e6g2"]
+[ext_resource type="PackedScene" uid="uid://hof12wneyhmx" path="res://Scenes/Creature.tscn" id="2_d0e4l"]
+[ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_fhg4u"]
+[ext_resource type="PackedScene" uid="uid://4oc82ahxrxgy" path="res://Scenes/World.tscn" id="3_o7726"]
 
 [node name="Root" type="Node2D"]
 script = ExtResource("1_3e6g2")
+
+[node name="Camera" type="Camera2D" parent="."]
+limit_left = -3000
+limit_top = -3000
+limit_right = 3000
+limit_bottom = 3000
+limit_smoothed = true
+position_smoothing_enabled = true
+editor_draw_limits = true
+script = ExtResource("2_fhg4u")
+
+[node name="World" parent="." instance=ExtResource("3_o7726")]
+
+[node name="Creature" parent="." instance=ExtResource("2_d0e4l")]
+z_index = 1
