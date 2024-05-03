@@ -19,7 +19,6 @@ config/icon="res://Assets/Icon.svg"
 
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
-window/vsync/vsync_mode=2
 
 [dotnet]
 
