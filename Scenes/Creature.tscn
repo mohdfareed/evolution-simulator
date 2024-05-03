@@ -1,29 +1,17 @@
-[gd_scene load_steps=5 format=3 uid="uid://hof12wneyhmx"]
+[gd_scene load_steps=3 format=3 uid="uid://hof12wneyhmx"]
 
 [ext_resource type="Script" path="res://Scripts/Creature.cs" id="1_31oft"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3pjwa"]
-radius = 30.0
-height = 100.0
-
-[sub_resource type="SphereMesh" id="SphereMesh_d5xgl"]
-
-[sub_resource type="MeshTexture" id="MeshTexture_4snfk"]
-mesh = SubResource("SphereMesh_d5xgl")
+[sub_resource type="CircleShape2D" id="CircleShape2D_afaex"]
+radius = 32.0
 
 [node name="Creature" type="CharacterBody2D"]
+rotation = 1.5708
 input_pickable = true
 motion_mode = 1
 script = ExtResource("1_31oft")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_3pjwa")
-
-[node name="Polygon2D" type="Polygon2D" parent="."]
-color = Color(1, 0, 0.0156863, 1)
-antialiased = true
-texture = SubResource("MeshTexture_4snfk")
-polygon = PackedVector2Array(-30, -50, 30, -50, 30, 50, -30, 50)
-uv = PackedVector2Array(-50, -50, 50, -50, 50, 50, -50, 50)
+shape = SubResource("CircleShape2D_afaex")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]

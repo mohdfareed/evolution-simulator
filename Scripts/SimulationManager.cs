@@ -1,4 +1,3 @@
-using System;
 using Godot;
 
 namespace Scripts;
@@ -8,7 +7,7 @@ public partial class SimulationManager : Node2D
 
     public static SimulationManager Instance { get; private set; }
     public Camera MainCamera { get; private set; }
-    public World World { get; private set; }
+    public World GameWorld { get; private set; }
 
 
     public override void _EnterTree()
@@ -30,15 +29,21 @@ public partial class SimulationManager : Node2D
 
     public override void _Ready()
     {
-        // load world
-        Instance.World = GetNode<World>("World");
-        if (Instance.World == null)
-            throw new NullReferenceException("World node not found.");
+        // load game world and main camera
+        for (int i = 0; i < GetChildCount(); i++)
+        {
+            Node child = GetChild(i);
+            if (child is World)
+                Instance.GameWorld = child as World;
+            else if (child is Camera)
+                Instance.MainCamera = child as Camera;
+        }
 
-        // load main camera
-        Instance.MainCamera = GetNode<Camera>("Camera");
+        // check if components are properly set up
+        if (Instance.GameWorld == null)
+            GD.PrintErr("World node not found.");
         if (Instance.MainCamera == null)
-            throw new NullReferenceException("Camera node not found.");
+            GD.PrintErr("Camera node not found.");
         Instance.MainCamera.MakeCurrent();
     }
 }

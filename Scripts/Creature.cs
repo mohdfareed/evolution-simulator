@@ -9,6 +9,9 @@ public partial class Creature : CharacterBody2D
     public float Speed { get; set; } = 1.5f;
 
     private Vector2 _velocity = Vector2.Zero;
+    private float _size = 32f;
+    private Color _color = new(1f, 0.25f, 0.1f);
+    private Color _accentColor = new(0.1f, 0.35f, 1f);
 
 
     public override void _PhysicsProcess(double delta)
@@ -36,5 +39,17 @@ public partial class Creature : CharacterBody2D
         {
             SimulationManager.Instance.MainCamera.FollowTarget(this);
         }
+    }
+
+    public override void _Draw()
+    {
+        // Draw the creature as a circle with a triangle pointing in the direction of movement
+        DrawCircle(Vector2.Zero, _size, _color);
+        DrawColoredPolygon(new Vector2[]
+        {
+            new (0, -_size * 0.75f),
+            new (-_size * 0.25f, _size * 0.25f),
+            new (_size * 0.25f, _size * 0.25f)
+        }, _accentColor);
     }
 }

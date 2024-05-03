@@ -1,16 +1,26 @@
 using Godot;
 
 namespace Scripts;
+
+/// <summary>
+/// 2D camera that follows a target node and allows zooming and dragging. It
+/// has two modes: following a target and free mode. In free mode, the camera
+/// can be dragged around. In target mode, the camera follows the target node.
+/// The camera can be zoomed in and out using the mouse wheel or pinch gesture.
+/// </summary>
 public partial class Camera : Camera2D
 {
-    [Export] public Vector2 TargetedZoom = new(1.5f, 1.5f);
-    [Export] public float ZoomSpeed = 0.01f;
+    /// <summary>The zoom level when following a target node.</summary>
+    [Export] public Vector2 TargetingZoom = new(1.5f, 1.5f);
+    /// <summary>The minimum zoom level allowed.</summary>
     [Export] public Vector2 MinZoom = new(0.5f, 0.5f);
-    [Export] public Vector2 MaxZoom = new(2.5f, 2.5f);
+    /// <summary>The maximum zoom level allowed.</summary>
+    [Export] public Vector2 MaxZoom = new(3.5f, 3.5f);
 
-    private const float ZOOM_LERP = 15f;
-    private const float DRAG_SPEED = 50f;
-    private const float SCROLL_SPEED = 25f;
+    private const float DRAG_SPEED = 25; // dragging speed
+    private const float SCROLL_SPEED = 0.01f; // mouse scroll zoom speed
+    private const float ZOOM_LERP = 5f; // zoom transition speed
+    private readonly Vector2 _maxZoomSpeed = new(2.5f, 2.5f); // max change in zoom
 
     private Vector2 _defaultZoom = new(1.0f, 1.0f);
     private Vector2 _zoom = new(1.0f, 1.0f);
@@ -28,20 +38,26 @@ public partial class Camera : Camera2D
         // store default zoom and offset
         _defaultZoom = Zoom;
         _defaultOffset = Offset;
+        // set initial zoom and offset
         _zoom = _defaultZoom;
         _offset = _defaultOffset;
     }
 
     public override void _Process(double delta)
     {
-        if (_zoom != Zoom) // transition zoom smoothly
-            Zoom = Zoom.Lerp(_zoom, (float)delta * ZOOM_LERP);
-
-        // move camera
+        // move camera (component handles transitions)
         if (_target is null) // apply offset only
             GlobalPosition = _offset;
         else // follow the target and apply offset
             GlobalPosition = _target.GlobalPosition + _offset;
+
+        // apply zoom
+        if (_zoom != Zoom)
+        {
+            var newZoom = Zoom.Lerp(_zoom, ZOOM_LERP); // smooth transition
+            // limit the speed at which the camera zooms in and out
+            Zoom += (newZoom - Zoom).Clamp(-_maxZoomSpeed, _maxZoomSpeed) * (float)delta;
+        }
     }
 
     public override void _Input(InputEvent @event)
@@ -59,8 +75,8 @@ public partial class Camera : Camera2D
         }
         else
         {
-            // update target and reset zoom and offset
-            _zoom = TargetedZoom;
+            // reset zoom and offset
+            _zoom = TargetingZoom;
             _offset = _defaultOffset;
         }
         _zoom = _zoom.Clamp(MinZoom, MaxZoom);
@@ -72,12 +88,12 @@ public partial class Camera : Camera2D
         // handle zoom input
         float zoomDir = 0;
         if (@event is InputEventMagnifyGesture magnifyGesture)
-            zoomDir = (magnifyGesture.Factor - 1) * SCROLL_SPEED;
+            zoomDir = magnifyGesture.Factor - 1;
         if (Input.GetAxis("zoom_out", "zoom_in") != 0)
-            zoomDir = Input.GetAxis("zoom_out", "zoom_in");
+            zoomDir = Input.GetAxis("zoom_out", "zoom_in") * SCROLL_SPEED;
 
         // zoom in or out
-        _zoom += Vector2.One * zoomDir * ZoomSpeed; // apply zoom offset
+        _zoom += Vector2.One * zoomDir; // apply zoom offset
         _zoom = _zoom.Clamp(MinZoom, MaxZoom); // clamp zoom
     }
 
@@ -97,7 +113,7 @@ public partial class Camera : Camera2D
         if (@event is InputEventPanGesture panGesture)
             offset = panGesture.Delta * DRAG_SPEED;
         if (_isDragging && @event is InputEventMouseMotion mouseMotion)
-            offset = -mouseMotion.Relative;
+            offset = -mouseMotion.Relative; // move in the opposite direction
 
         // offset camera
         _offset += offset;
