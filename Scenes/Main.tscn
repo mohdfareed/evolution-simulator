@@ -18,14 +18,9 @@ PixelsPerMeter = 250.0
 environment = SubResource("Environment_usjow")
 
 [node name="Camera" type="Camera2D" parent="."]
-limit_left = -3000
-limit_top = -3000
-limit_right = 3000
-limit_bottom = 3000
-limit_smoothed = true
 position_smoothing_enabled = true
-editor_draw_limits = true
 script = ExtResource("2_fhg4u")
+MaxZoom = Vector2(100, 100)
 
 [node name="World" parent="." instance=ExtResource("3_o7726")]
 

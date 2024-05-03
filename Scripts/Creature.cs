@@ -38,6 +38,8 @@ public partial class Creature : CharacterBody2D
         if (Input.IsActionJustPressed("ui_select"))
         {
             SimulationManager.Instance.MainCamera.FollowTarget(this);
+            SimulationManager.Instance.GameWorld.LoadChunk(this);
+
         }
     }
 
