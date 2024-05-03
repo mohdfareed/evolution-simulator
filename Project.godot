@@ -17,7 +17,7 @@ config/icon="res://Assets/Icon.svg"
 
 [display]
 
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [dotnet]
