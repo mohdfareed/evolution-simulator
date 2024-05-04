@@ -15,7 +15,7 @@ public partial class Camera : Camera2D
     /// <summary>The minimum zoom level allowed.</summary>
     [Export] public Vector2 MinZoom = new(0.5f, 0.5f);
     /// <summary>The maximum zoom level allowed.</summary>
-    [Export] public Vector2 MaxZoom = new(3.5f, 3.5f);
+    [Export] public Vector2 MaxZoom = new(2.0f, 2.0f);
 
     private const float DRAG_SPEED = 25; // dragging speed
     private const float SCROLL_SPEED = 0.01f; // mouse scroll zoom speed
@@ -60,7 +60,7 @@ public partial class Camera : Camera2D
         }
     }
 
-    public override void _Input(InputEvent @event)
+    public override void _UnhandledInput(InputEvent @event)
     {
         HandleScroll(@event);
         HandleDrag(@event);
