@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://hof12wneyhmx"]
+[gd_scene load_steps=4 format=3 uid="uid://hof12wneyhmx"]
 
 [ext_resource type="Script" path="res://Scripts/Creature.cs" id="1_31oft"]
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="2_kwfbl"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_afaex"]
-radius = 32.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_odkhl"]
+size = Vector2(32.5269, 32.5269)
 
 [node name="Creature" type="CharacterBody2D"]
 rotation = 1.5708
@@ -12,6 +13,14 @@ motion_mode = 1
 script = ExtResource("1_31oft")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_afaex")
+position = Vector2(9.35398e-06, 4.00001)
+rotation = 0.785398
+scale = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_odkhl")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_kwfbl")
+region_enabled = true
+region_rect = Rect2(1536, 256, 128, 128)
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]

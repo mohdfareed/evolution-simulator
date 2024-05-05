@@ -27,10 +27,7 @@ public partial class Camera : Camera2D
     private Vector2 _defaultOffset = Vector2.Zero;
     private Vector2 _offset = Vector2.Zero;
     private bool _isDragging = false;
-
-#nullable enable
     private Node2D? _target = null; // target to follow, if any
-#nullable disable
 
 
     public override void _Ready()
@@ -66,7 +63,7 @@ public partial class Camera : Camera2D
         HandleDrag(@event);
     }
 
-    public void FollowTarget(Node2D target = null)
+    public void FollowTarget(Node2D? target = null)
     {
         if (target is null)
         {

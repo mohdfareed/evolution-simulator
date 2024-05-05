@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://u523mdvwew28"]
+
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_dv873"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bwcgr"]
+size = Vector2(128, 128)
+
+[node name="FoodRed" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_dv873")
+region_enabled = true
+region_rect = Rect2(256, 2.08165e-12, 128, 128)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_bwcgr")

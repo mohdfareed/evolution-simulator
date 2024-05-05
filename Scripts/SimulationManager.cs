@@ -3,11 +3,9 @@ using Godot;
 namespace Scripts;
 public partial class SimulationManager : Node2D
 {
-    [Export] public float PixelsPerMeter = 100f;
-
-    public static SimulationManager Instance { get; private set; }
-    public Camera MainCamera { get; private set; }
-    public World.WorldManager GameWorld { get; private set; }
+    public static SimulationManager? Instance { get; private set; } = null;
+    public Camera MainCamera { get; private set; } = null!;
+    public World.Manager GameWorld { get; private set; } = null!;
 
 
     public override void _EnterTree()
@@ -33,17 +31,17 @@ public partial class SimulationManager : Node2D
         for (int i = 0; i < GetChildCount(); i++)
         {
             Node child = GetChild(i);
-            if (child is World.WorldManager)
-                Instance.GameWorld = child as World.WorldManager;
-            else if (child is Camera)
-                Instance.MainCamera = child as Camera;
+            if (child is World.Manager worldManager)
+                Instance!.GameWorld = worldManager;
+            else if (child is Camera camera)
+                Instance!.MainCamera = camera;
         }
 
         // check if components are properly set up
-        if (Instance.GameWorld == null)
+        if (Instance!.GameWorld == null)
         {
             GD.PrintErr("World node not found.");
-            Instance.GameWorld = new World.WorldManager();
+            Instance.GameWorld = new World.Manager();
         }
         if (Instance.MainCamera == null)
         {

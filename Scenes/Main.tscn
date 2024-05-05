@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/SimulationManager.cs" id="1_3e6g2"]
 [ext_resource type="PackedScene" uid="uid://hof12wneyhmx" path="res://Scenes/Creature.tscn" id="2_d0e4l"]
 [ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_fhg4u"]
-[ext_resource type="PackedScene" uid="uid://4oc82ahxrxgy" path="res://Scenes/World.tscn" id="3_o7726"]
+[ext_resource type="PackedScene" uid="uid://cbb2mdkpakojo" path="res://Scenes/World.tscn" id="3_o7726"]
 
 [sub_resource type="Environment" id="Environment_usjow"]
 background_mode = 3
@@ -12,7 +12,6 @@ glow_intensity = 2.0
 
 [node name="Root" type="Node2D"]
 script = ExtResource("1_3e6g2")
-PixelsPerMeter = 250.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_usjow")
@@ -20,9 +19,9 @@ environment = SubResource("Environment_usjow")
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 script = ExtResource("2_fhg4u")
-MaxZoom = Vector2(100, 100)
-
-[node name="World" parent="." instance=ExtResource("3_o7726")]
+MinZoom = Vector2(0.1, 0.1)
 
 [node name="Creature" parent="." instance=ExtResource("2_d0e4l")]
 z_index = 1
+
+[node name="World" parent="." instance=ExtResource("3_o7726")]
