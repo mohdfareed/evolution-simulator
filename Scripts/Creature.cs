@@ -1,18 +1,32 @@
 using Godot;
 
 namespace Scripts;
+[Tool]
+[GlobalClass]
 public partial class Creature : CharacterBody2D
 {
-    public const float ACCELERATION = 0.15f;
+    [Export] public float Speed { get; set; } = 150f;
+    [Signal] public delegate void SelectedEventHandler(Creature creature);
+
+    public const float ACCELERATION = 1.5f;
     public const float STOPPING_DISTANCE = 0.1f;
 
-    public float Speed { get; set; } = 150f;
-
     private Vector2 _velocity = Vector2.Zero;
-    private float _size = 32f;
-    private Color _color = new(1f, 0.25f, 0.1f);
-    private Color _accentColor = new(0.1f, 0.35f, 1f);
+    private Timer _movementTimer = new();
 
+    public override void _InputEvent(Viewport viewport, InputEvent @event, int shapeIdx)
+    {
+        if (Input.IsActionJustPressed("select"))
+            EmitSignal(SignalName.Selected, this);
+    }
+
+    public override void _Ready()
+    {
+        _movementTimer.WaitTime = 1;
+        _movementTimer.Autostart = true;
+        _movementTimer.Timeout += MoveRandomly;
+        AddChild(_movementTimer);
+    }
 
     public override void _PhysicsProcess(double delta)
     {
@@ -21,35 +35,14 @@ public partial class Creature : CharacterBody2D
             _velocity = Vector2.Zero;
 
         // move and rotate the creature in the direction of the velocity
-        Velocity = Velocity.Lerp(_velocity, ACCELERATION);
+        Velocity = Velocity.Lerp(_velocity, ACCELERATION * (float)delta);
         Rotate(Vector2.Zero.DirectionTo(Velocity).Angle() - GlobalRotation + Mathf.Pi / 2);
         MoveAndSlide();
-        // SimulationManager.Instance.GameWorld.LoadChunk(this);
     }
 
-    public override void _Input(InputEvent @event)
+    private void MoveRandomly()
     {
-        Vector2 inputDir = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-        _velocity = inputDir.Normalized() * Speed;
-    }
-
-    public override void _InputEvent(Viewport viewport, InputEvent @event, int shapeIdx)
-    {
-        if (Input.IsActionJustPressed("ui_select"))
-        {
-            SimulationManager.Instance?.MainCamera.FollowTarget(this);
-        }
-    }
-
-    public override void _Draw()
-    {
-        // Draw the creature as a circle with a triangle pointing in the direction of movement
-        DrawCircle(Vector2.Zero, _size, _color);
-        DrawColoredPolygon(new Vector2[]
-        {
-            new (0, -_size * 0.75f),
-            new (-_size * 0.25f, _size * 0.25f),
-            new (_size * 0.25f, _size * 0.25f)
-        }, _accentColor);
+        Vector2 randDir = new(GD.RandRange(-1, 1), GD.RandRange(-1, 1));
+        _velocity = randDir.Normalized() * Speed;
     }
 }

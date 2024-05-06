@@ -1,6 +1,8 @@
 using Godot;
 
 namespace Scripts.World;
+[Tool]
+[GlobalClass]
 public partial class Manager : Node2D
 {
     Environment _environment = null!;
@@ -13,24 +15,13 @@ public partial class Manager : Node2D
             if (child is Environment environment)
                 _environment = environment;
         }
+    }
+
+    public override string[] _GetConfigurationWarnings()
+    {
+        var warnings = new System.Collections.Generic.List<string>();
         if (_environment is null)
-        {
-            GD.PrintErr("Environment node not found.");
-            _environment = new Environment();
-        }
-    }
-
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        CheckCameraReset();
-    }
-
-    private void CheckCameraReset()
-    {
-        if (Input.IsActionJustPressed("ui_select"))
-        {
-            if (_environment.IsOnEnvironment(GetGlobalMousePosition()))
-                SimulationManager.Instance?.MainCamera.FollowTarget(null);
-        }
+            warnings.Add("Environment node not found.");
+        return warnings.ToArray();
     }
 }

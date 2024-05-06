@@ -2,6 +2,7 @@ using Godot;
 
 namespace Scripts.World;
 [Tool]
+[GlobalClass]
 public partial class Environment : TileMap
 {
     [Export]

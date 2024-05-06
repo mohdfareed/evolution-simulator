@@ -15,12 +15,9 @@ script = ExtResource("1_31oft")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(9.35398e-06, 4.00001)
 rotation = 0.785398
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_odkhl")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_kwfbl")
 region_enabled = true
 region_rect = Rect2(1536, 256, 128, 128)
-
-[connection signal="input_event" from="." to="." method="_on_input_event"]
