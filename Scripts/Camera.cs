@@ -17,7 +17,7 @@ public partial class Camera : Camera2D
     /// <summary>The speed at which the camera pans.</summary>
     [Export] public float PanningSpeed = 1;
     /// <summary>The speed at which the camera zooms in and out.</summary>
-    [Export] public float ZoomSpeed = 0.25f;
+    [Export] public float ZoomSpeed = 0.05f;
     /// <summary>The minimum zoom level allowed.</summary>
     [Export] public float MinZoom = 0.1f;
     /// <summary>The maximum zoom level allowed.</summary>

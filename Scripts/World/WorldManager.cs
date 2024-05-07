@@ -1,18 +1,18 @@
 using Godot;
 
-namespace Scripts.World;
+namespace Scripts;
 [Tool]
 [GlobalClass]
-public partial class Manager : Node2D
+public partial class WorldManager : Node2D
 {
-    Environment _environment = null!;
+    World.Environment _environment = null!;
 
     public override void _Ready()
     {
         for (int i = 0; i < GetChildCount(); i++)
         {
             Node child = GetChild(i);
-            if (child is Environment environment)
+            if (child is World.Environment environment)
                 _environment = environment;
         }
     }
