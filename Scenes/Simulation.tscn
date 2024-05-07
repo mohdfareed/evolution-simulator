@@ -1,14 +1,16 @@
 [gd_scene load_steps=6 format=3 uid="uid://cpsee5q1emeqc"]
 
 [ext_resource type="Script" path="res://Scripts/SimulationManager.cs" id="1_o7r1h"]
-[ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_v1kh5"]
+[ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_fjqgb"]
 [ext_resource type="PackedScene" uid="uid://hof12wneyhmx" path="res://Scenes/Creature.tscn" id="3_3mpj2"]
 [ext_resource type="PackedScene" uid="uid://cbb2mdkpakojo" path="res://Scenes/World.tscn" id="4_m24gn"]
 
 [sub_resource type="Environment" id="Environment_usjow"]
 background_mode = 3
+background_color = Color(1, 1, 1, 1)
 glow_enabled = true
-glow_intensity = 2.0
+fog_density = 0.6962
+fog_sky_affect = 0.45
 
 [node name="Simulation" type="Node2D"]
 script = ExtResource("1_o7r1h")
@@ -18,10 +20,17 @@ environment = SubResource("Environment_usjow")
 
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
-script = ExtResource("2_v1kh5")
+script = ExtResource("2_fjqgb")
 
 [node name="Creature" parent="." instance=ExtResource("3_3mpj2")]
 z_index = 1
+position = Vector2(22.7034, 22.7034)
 
 [node name="World" parent="." instance=ExtResource("4_m24gn")]
 position = Vector2(-4096, -4096)
+
+[node name="Sun" type="DirectionalLight2D" parent="."]
+rotation = 211.083
+shadow_enabled = true
+shadow_filter_smooth = 2.5
+height = 1.0

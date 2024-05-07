@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfg3rv7iqqxfd"]
+[gd_scene load_steps=4 format=3 uid="uid://doagob478ofgl"]
 
-[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_0dpej"]
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_v57d2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p1h5x"]
 radius = 20.0
@@ -11,10 +11,10 @@ load_path = "res://.godot/imported/2d_lights_and_shadows_neutral_point_light.web
 [node name="FoodBlue" type="Node2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_0dpej")
+texture = ExtResource("1_v57d2")
 offset = Vector2(2.08165e-12, -4)
 region_enabled = true
-region_rect = Rect2(1536, 512, 128, 128)
+region_rect = Rect2(1536, 128, 128, 128)
 
 [node name="Area2D" type="Area2D" parent="."]
 
@@ -22,4 +22,6 @@ region_rect = Rect2(1536, 512, 128, 128)
 shape = SubResource("CircleShape2D_p1h5x")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+energy = 0.5
 texture = SubResource("CompressedTexture2D_neeyi")
+texture_scale = 2.0

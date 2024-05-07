@@ -1,68 +1,88 @@
 using Godot;
+using Godot.Collections;
 
 namespace Scripts.World;
+
+public enum Biome // 4 basic biomes
+{
+    Ocean, // cold, wet, water
+    Desert, // hot, dry, sandy
+    Forest, // hot, wet, green
+    Mountain, // cold, dry, rocky
+}
+
+public enum EnvironmentLayers
+{
+    Ground,
+    Surface,
+    Aerial
+}
+
 [Tool]
 [GlobalClass]
 public partial class Environment : TileMap
 {
-    [Export]
-    public Godot.Collections.Array<Generator> Generators = new();
-    [Export]
-    public Vector2I MapSize = new(64, 64);
+    [Export] public Vector2I InitialMapSize = new(64, 64);
+    [Export] public BiomeGenerator BiomeGenerator = new();
+    [Export] public Array<WorldGenerator?> Generators = new();
 
-    public const int TERRAIN_SET = 0;
+    private Dictionary<Vector2I, Biome> _environmentGrid = new();
 
+    public bool IsOnEnvironment(Vector2 globalPosition)
+    {
+        // check the tile at the position
+        var tile = GetCellTileData(0, GlobalToMap(globalPosition));
+        return tile is not null;
+    }
+
+    public void CreateTile(Vector2 globalPosition, WorldResource resource)
+    {
+        CreateTile(GlobalToMap(globalPosition), resource);
+    }
 
     public override void _Ready()
     {
         Clear();
-        GenerateWorld();
+        BiomeGenerator.Initialize();
+        foreach (var generator in Generators)
+            generator?.Initialize();
+        GenerateWorld(Vector2I.Zero, InitialMapSize);
     }
 
-    public bool IsOnEnvironment(Vector2 globalPosition)
+    private void GenerateWorld(Vector2I position, Vector2I size)
     {
-        // get tile position
-        var localPos = ToLocal(globalPosition);
-        var tilePos = LocalToMap(localPos);
-
-        // check the tile at the position
-        var tile = GetCellTileData(0, tilePos);
-        return tile is not null;
-    }
-
-    private void GenerateWorld()
-    {
-        for (int x = 0; x < MapSize.X; x++)
+        for (int x = 0; x < size.X; x++)
         {
-            for (int y = 0; y < MapSize.Y; y++)
+            for (int y = 0; y < size.Y; y++)
             {
-                // generate resources for the tile
-                Godot.Collections.Array<GeneratedResource?> resources = new();
-                foreach (var Generator in Generators)
-                    if (Generator is not null)
-                        resources.AddRange(Generator.GenerateAt(x, y));
+                // generate biome
+                var tilePosition = new Vector2I(position.X + x, position.Y + y);
+                var biome = BiomeGenerator.GenerateAt(tilePosition, this);
+                if (biome is not Biome _biome)
+                    continue; // skip if not initialized as biome
+                _environmentGrid[new Vector2I(position.X + x, position.Y + y)] = _biome;
 
-                // create tiles for the resources
-                foreach (var resource in resources)
-                {
-                    if (resource is null)
-                        continue; // skip empty tiles
-                    CreateTile(new Vector2I(x, y), resource);
-                }
+                // generate resources
+                foreach (var generator in Generators)
+                    generator?.GenerateAt(tilePosition, _biome, this);
             }
         }
     }
 
-    private void CreateTile(Vector2I MapCoord, GeneratedResource resource)
+    private Vector2I GlobalToMap(Vector2 globalPosition)
     {
-        if (resource is TerrainResource terrain)
-        {
-            var tiles = new Godot.Collections.Array<Vector2I> { MapCoord };
-            SetCellsTerrainConnect(terrain.Layer, tiles, terrain.TerrainSet, terrain.Index);
-        }
-        if (resource is SceneResource scene)
-            SetCell(scene.Layer, MapCoord, scene.Source, Vector2I.Zero, scene.Index);
-        if (resource is TileResource tile)
-            SetCell(tile.Layer, MapCoord, tile.Source, tile.Coordinates, tile.Alternate);
+        return LocalToMap(ToLocal(globalPosition));
+    }
+
+    public override string[] _GetConfigurationWarnings()
+    {
+        var warnings = new System.Collections.Generic.List<string>();
+        foreach (var warning in BiomeGenerator.Warnings(this))
+            warnings.Add(warning);
+        foreach (var generator in Generators)
+            if (generator is not null)
+                foreach (var warning in generator.Warnings(this))
+                    warnings.Add(warning);
+        return warnings.ToArray();
     }
 }
