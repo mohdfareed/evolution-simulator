@@ -10,17 +10,15 @@ public partial class TileResource : WorldResource
     [Export] public Vector2I Coordinates { get; set; } = Vector2I.Zero; // tile coordinates
     [Export] public int Alternate { get; set; } = 0; // tile alternate index
 
-    public override bool GenerateAt(Vector2I position, TileMap tilemap)
+    public override void GenerateAt(Vector2I position, EnvironmentLayer layer, TileMap tilemap)
     {
         try
         {
-            tilemap.SetCell((int)Layer, position, Source, Coordinates, Alternate);
-            return true;
+            tilemap.SetCell((int)layer, position, Source, Coordinates, Alternate);
         }
         catch (System.Exception exception)
         {
-            GD.PrintErr($"{this.GetType()}: failed to generate at {position}.", exception);
-            return false;
+            GD.PrintErr($"{this}: Failed to generate at {position}: ", exception);
         }
     }
 
@@ -30,12 +28,12 @@ public partial class TileResource : WorldResource
             yield break;
         if (tilemap.TileSet.GetSource(Source) is not TileSetAtlasSource source)
         {
-            yield return $"{this.GetType()}: source is not a tileset atlas source.";
+            yield return $"{this}: Source is not a tileset atlas source.";
             yield break;
         }
-        if (!source.HasTile(Coordinates) || !source.HasAlternativeTile(Coordinates, Alternate))
-        {
-            yield return $"{this.GetType()}: tile does not exist in the tileset.";
-        }
+        if (!source.HasTile(Coordinates))
+            yield return $"{this}: Tile does not exist in the tileset.";
+        if (!source.HasAlternativeTile(Coordinates, Alternate))
+            yield return $"{this}: Alternate tile does not exist in the tileset.";
     }
 }

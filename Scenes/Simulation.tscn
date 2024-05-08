@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://cpsee5q1emeqc"]
+[gd_scene load_steps=8 format=3 uid="uid://cpsee5q1emeqc"]
 
 [ext_resource type="Script" path="res://Scripts/SimulationManager.cs" id="1_o7r1h"]
 [ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_fjqgb"]
 [ext_resource type="PackedScene" uid="uid://hof12wneyhmx" path="res://Scenes/Creature.tscn" id="3_3mpj2"]
 [ext_resource type="PackedScene" uid="uid://cbb2mdkpakojo" path="res://Scenes/World.tscn" id="4_m24gn"]
+[ext_resource type="Script" path="res://Scripts/Food.cs" id="5_vt1q3"]
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="6_v54j6"]
 
 [sub_resource type="Environment" id="Environment_usjow"]
 background_mode = 3
@@ -12,7 +14,7 @@ glow_enabled = true
 fog_density = 0.6962
 fog_sky_affect = 0.45
 
-[node name="Simulation" type="Node2D"]
+[node name="Simulation" type="Node"]
 script = ExtResource("1_o7r1h")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -27,10 +29,17 @@ z_index = 1
 position = Vector2(22.7034, 22.7034)
 
 [node name="World" parent="." instance=ExtResource("4_m24gn")]
-position = Vector2(-4096, -4096)
 
 [node name="Sun" type="DirectionalLight2D" parent="."]
-rotation = 211.083
+rotation = 2.12749
 shadow_enabled = true
 shadow_filter_smooth = 2.5
-height = 1.0
+
+[node name="Food" type="Node2D" parent="."]
+position = Vector2(0, -1.14441)
+script = ExtResource("5_vt1q3")
+
+[node name="Sprite2D" type="Sprite2D" parent="Food"]
+texture = ExtResource("6_v54j6")
+region_enabled = true
+region_rect = Rect2(159, 415, 66, 66)

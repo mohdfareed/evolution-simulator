@@ -9,20 +9,18 @@ public partial class TerrainResource : WorldResource
     [Export] public int TerrainSet { get; set; } = 0; // tileset terrain index
     [Export] public int Index { get; set; } = 0; // terrain index
 
-    // private Godot.Collections.Array<Vector2I> _tiles = new() { Vector2I.Zero };
+    private Godot.Collections.Array<Vector2I> _tiles = new() { Vector2I.Zero };
 
-    public override bool GenerateAt(Vector2I position, TileMap tilemap)
+    public override void GenerateAt(Vector2I position, EnvironmentLayer layer, TileMap tilemap)
     {
-        var _tiles = new Godot.Collections.Array<Vector2I> { position };
+        _tiles[0] = position;
         try
         {
-            tilemap.SetCellsTerrainConnect((int)Layer, _tiles, TerrainSet, Index);
-            return true;
+            tilemap.SetCellsTerrainConnect((int)layer, _tiles, TerrainSet, Index);
         }
         catch (System.Exception exception)
         {
-            GD.PrintErr($"{this.GetType()}: failed to generate at {position}.", exception);
-            return false;
+            GD.PrintErr($"{this}: Failed to generate at {position}: ", exception);
         }
     }
 
@@ -30,17 +28,9 @@ public partial class TerrainResource : WorldResource
     {
         if (tilemap is null)
             yield break;
-
-        // check if terrain exists in the tileset
-        var validSet = TerrainSet < tilemap.TileSet.GetTerrainSetsCount();
-        if (!validSet)
-        {
-            yield return $"{this.GetType()}: terrain set does not exist in the tileset.";
-        }
-        var validIndex = Index < tilemap.TileSet.GetTerrainsCount(TerrainSet);
-        if (!validIndex)
-        {
-            yield return $"{this.GetType()}: terrain index does not exist in the terrain set.";
-        }
+        if (TerrainSet >= tilemap.TileSet.GetTerrainSetsCount())
+            yield return $"{this}: Terrain set does not exist in the tileset.";
+        if (Index >= tilemap.TileSet.GetTerrainsCount(TerrainSet))
+            yield return $"{this}: Terrain index does not exist in the terrain set.";
     }
 }

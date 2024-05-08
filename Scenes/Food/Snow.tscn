@@ -1,14 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://cwxqrcjcvoctl"]
+[gd_scene load_steps=5 format=3 uid="uid://cwxqrcjcvoctl"]
 
+[ext_resource type="Script" path="res://Scripts/Food.cs" id="1_7tire"]
 [ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_aga5i"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p1h5x"]
 radius = 20.0
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_neeyi"]
-load_path = "res://.godot/imported/2d_lights_and_shadows_neutral_point_light.webp-7c52078d91b8c02803a1fd59fbc4c252.ctex"
 
 [node name="FoodBlue" type="Node2D"]
+script = ExtResource("1_7tire")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_aga5i")

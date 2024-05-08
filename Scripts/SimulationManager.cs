@@ -4,7 +4,7 @@ using Godot;
 namespace Scripts;
 [Tool]
 [GlobalClass]
-public partial class SimulationManager : Node2D
+public partial class SimulationManager : Node
 {
     [Export] public int DayLength = 120; // length of a day in seconds
 
@@ -39,6 +39,7 @@ public partial class SimulationManager : Node2D
     {
         // update day/night cycle
         Sun.RotationDegrees += 360 * (float)delta / DayLength;
+        Sun.RotationDegrees %= 360;
     }
 
     public override string[] _GetConfigurationWarnings()
