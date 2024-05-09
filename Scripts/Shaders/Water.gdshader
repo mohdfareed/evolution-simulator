@@ -16,11 +16,13 @@ void fragment(){
     vec2 next_tile_index_pixels = tile_index_pixels + tile_size - 2.0;
     vec2 tile_min = tile_index_pixels / tileset_size_pixels;
     vec2 tile_max = next_tile_index_pixels / tileset_size_pixels;
+
     // sample noise with distortion
     vec2 noise_uv = SCREEN_UV + speed * TIME;
     vec2 noise_value = 2.0 * texture(noise, noise_uv).rg - vec2(1.0);
     // clamp UV to tile limits
     vec2 uv = clamp(UV + noise_value * wave_strength, tile_min, tile_max);
+
     // apply distortion to UV
     COLOR = texture(TEXTURE, uv) * water_color;
 }

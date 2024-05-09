@@ -51,10 +51,4 @@ public partial class BiomeGenerator : Resource
     {
         return $"{GetType()}({ResourceName})";
     }
-
-    private Vector2 WorldToNoise(Vector2I worldPosition)
-    {
-        // get noise position from world position
-        return new Vector2(worldPosition.X, worldPosition.Y);
-    }
 }

@@ -2,10 +2,10 @@
 
 [ext_resource type="Shader" path="res://Scripts/Shaders/Water.gdshader" id="1_6ddly"]
 [ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_i5qnf"]
-[ext_resource type="PackedScene" uid="uid://chbq2bruxr6lu" path="res://Scenes/Food/Ocean.tscn" id="2_bivkr"]
-[ext_resource type="PackedScene" uid="uid://doagob478ofgl" path="res://Scenes/Food/Desert.tscn" id="3_1bdkv"]
-[ext_resource type="PackedScene" uid="uid://dfg3rv7iqqxfd" path="res://Scenes/Food/Grass.tscn" id="4_hjduo"]
-[ext_resource type="PackedScene" uid="uid://cwxqrcjcvoctl" path="res://Scenes/Food/Snow.tscn" id="5_5ru12"]
+[ext_resource type="PackedScene" uid="uid://chbq2bruxr6lu" path="res://Scenes/Environment/OceanLight.tscn" id="3_lq61q"]
+[ext_resource type="PackedScene" uid="uid://doagob478ofgl" path="res://Scenes/Environment/DesertLight.tscn" id="4_ax63y"]
+[ext_resource type="PackedScene" uid="uid://dfg3rv7iqqxfd" path="res://Scenes/Environment/GrassLight.tscn" id="5_4wxwu"]
+[ext_resource type="PackedScene" uid="uid://cwxqrcjcvoctl" path="res://Scenes/Environment/SnowLight.tscn" id="6_g3l6m"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_psemw"]
 
@@ -16,15 +16,20 @@ polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_iqfvi"]
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_naib3"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_83f6e"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_0b0jf"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_nked2"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_ktf2b"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_dn5yo"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_ne2qi"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_riqu0"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_mp2h2"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_og31b"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_44q4d"]
 frequency = 0.005
@@ -155,11 +160,13 @@ texture_region_size = Vector2i(128, 128)
 11:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:0/0/physics_layer_0/angular_velocity = 0.0
 11:1/0 = 0
+11:1/0/terrain_set = 0
 11:1/0/probability = 0.01
-11:1/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_naib3")
+11:1/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_83f6e")
 11:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:1/0/physics_layer_0/angular_velocity = 0.0
 12:1/0 = 0
+12:1/0/terrain_set = 0
 12:1/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_4tg4m")
 12:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:1/0/physics_layer_0/angular_velocity = 0.0
@@ -186,7 +193,7 @@ texture_region_size = Vector2i(128, 128)
 10:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
 11:2/0 = 0
 11:2/0/probability = 0.01
-11:2/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_0b0jf")
+11:2/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_nked2")
 11:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:2/0/physics_layer_0/angular_velocity = 0.0
 12:2/0 = 0
@@ -194,29 +201,35 @@ texture_region_size = Vector2i(128, 128)
 12:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:2/0/physics_layer_0/angular_velocity = 0.0
 11:3/0 = 0
+11:3/0/terrain_set = 0
 11:3/0/probability = 0.01
-11:3/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_ktf2b")
+11:3/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_dn5yo")
 11:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:3/0/physics_layer_0/angular_velocity = 0.0
 12:3/0 = 0
+12:3/0/terrain_set = 0
 12:3/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_ars1y")
 12:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:3/0/physics_layer_0/angular_velocity = 0.0
 11:4/0 = 0
+11:4/0/terrain_set = 0
 11:4/0/probability = 0.01
-11:4/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_ne2qi")
+11:4/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_riqu0")
 11:4/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:4/0/physics_layer_0/angular_velocity = 0.0
 12:4/0 = 0
+12:4/0/terrain_set = 0
 12:4/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_tlra5")
 12:4/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:4/0/physics_layer_0/angular_velocity = 0.0
 11:5/0 = 0
+11:5/0/terrain_set = 0
 11:5/0/probability = 0.01
-11:5/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_mp2h2")
+11:5/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_og31b")
 11:5/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:5/0/physics_layer_0/angular_velocity = 0.0
 12:5/0 = 0
+12:5/0/terrain_set = 0
 12:5/0/occlusion_layer_0/polygon = SubResource("OccluderPolygon2D_ny7fa")
 12:5/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:5/0/physics_layer_0/angular_velocity = 0.0
@@ -485,11 +498,11 @@ texture_region_size = Vector2i(128, 128)
 7:6/0/physics_layer_0/angular_velocity = 0.0
 
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_adinl"]
-resource_name = "Food"
-scenes/0/scene = ExtResource("2_bivkr")
-scenes/1/scene = ExtResource("3_1bdkv")
-scenes/2/scene = ExtResource("4_hjduo")
-scenes/3/scene = ExtResource("5_5ru12")
+resource_name = "Lights"
+scenes/0/scene = ExtResource("3_lq61q")
+scenes/1/scene = ExtResource("4_ax63y")
+scenes/2/scene = ExtResource("5_4wxwu")
+scenes/3/scene = ExtResource("6_g3l6m")
 
 [resource]
 tile_size = Vector2i(128, 128)

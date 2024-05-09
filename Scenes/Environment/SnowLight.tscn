@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://cwxqrcjcvoctl"]
+
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="1_cog47"]
+[ext_resource type="Texture2D" uid="uid://ciljj6dh258le" path="res://Assets/Light.png" id="2_hec1w"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r1rpi"]
+size = Vector2(128, 128)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_glxs6"]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
+
+[node name="SnowLight" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_cog47")
+region_enabled = true
+region_rect = Rect2(1408, 640, 128, 128)
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+energy = 0.5
+texture = ExtResource("2_hec1w")
+texture_scale = 3.5
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_r1rpi")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+occluder = SubResource("OccluderPolygon2D_glxs6")
