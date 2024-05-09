@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://cpsee5q1emeqc"]
+[gd_scene load_steps=21 format=3 uid="uid://cpsee5q1emeqc"]
 
 [ext_resource type="Script" path="res://Scripts/SimulationManager.cs" id="1_o7r1h"]
 [ext_resource type="Script" path="res://Scripts/Camera.cs" id="2_fjqgb"]
 [ext_resource type="PackedScene" uid="uid://hof12wneyhmx" path="res://Scenes/Creature.tscn" id="3_3mpj2"]
 [ext_resource type="PackedScene" uid="uid://cbb2mdkpakojo" path="res://Scenes/World.tscn" id="4_m24gn"]
-[ext_resource type="Script" path="res://Scripts/Food.cs" id="5_vt1q3"]
-[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="6_v54j6"]
+[ext_resource type="Shader" path="res://Scripts/Shaders/Fog.gdshader" id="5_35kye"]
 
 [sub_resource type="Environment" id="Environment_usjow"]
 background_mode = 3
@@ -14,32 +13,108 @@ glow_enabled = true
 fog_density = 0.6962
 fog_sky_affect = 0.45
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_vyj1l"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_be4mn"]
+width = 2048
+height = 1024
+seamless = true
+noise = SubResource("FastNoiseLite_vyj1l")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a5y2l"]
+shader = ExtResource("5_35kye")
+shader_parameter/color = Color(0.0196078, 0.0196078, 0.0196078, 1)
+shader_parameter/speed = Vector2(0.05, 0.05)
+shader_parameter/fade_multiplier = 1.0
+shader_parameter/fade_margin = 0.15
+shader_parameter/noise = SubResource("NoiseTexture2D_be4mn")
+
+[sub_resource type="Gradient" id="Gradient_g2fav"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wifft"]
+gradient = SubResource("Gradient_g2fav")
+width = 2048
+height = 1024
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ggvwi"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_jndfx"]
+seamless = true
+noise = SubResource("FastNoiseLite_ggvwi")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_m3vs4"]
+shader = ExtResource("5_35kye")
+shader_parameter/color = Color(0.0196078, 0.0196078, 0.0196078, 1)
+shader_parameter/speed = Vector2(0.05, 0.05)
+shader_parameter/fade_multiplier = 1.0
+shader_parameter/fade_margin = 0.15
+shader_parameter/noise = SubResource("NoiseTexture2D_jndfx")
+
+[sub_resource type="QuadMesh" id="QuadMesh_se0cx"]
+size = Vector2(1000, 1000)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_8jxrx"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_go8tb"]
+seamless = true
+noise = SubResource("FastNoiseLite_8jxrx")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ubcsx"]
+shader = ExtResource("5_35kye")
+shader_parameter/color = Color(0.099986, 0.099986, 0.099986, 1)
+shader_parameter/speed = Vector2(0.05, 0.05)
+shader_parameter/fade_multiplier = 1.0
+shader_parameter/fade_margin = 0.15
+shader_parameter/noise = SubResource("NoiseTexture2D_go8tb")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_vx05s"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_r8eh6"]
+width = 1024
+height = 1024
+noise = SubResource("FastNoiseLite_vx05s")
+
 [node name="Simulation" type="Node"]
 script = ExtResource("1_o7r1h")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_usjow")
 
+[node name="Fog" type="ParallaxBackground" parent="."]
+scroll_ignore_camera_zoom = true
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="Fog"]
+motion_scale = Vector2(0.15, 0.15)
+motion_mirroring = Vector2(3072, 1536)
+
+[node name="Sprite2D" type="Sprite2D" parent="Fog/ParallaxLayer"]
+material = SubResource("ShaderMaterial_a5y2l")
+scale = Vector2(2.5, 2.5)
+texture = SubResource("GradientTexture2D_wifft")
+
+[node name="MeshInstance2D2" type="MeshInstance2D" parent="Fog/ParallaxLayer"]
+visible = false
+light_mask = 0
+material = SubResource("ShaderMaterial_m3vs4")
+position = Vector2(203.5, 445.25)
+scale = Vector2(3.49, 3.803)
+mesh = SubResource("QuadMesh_se0cx")
+
+[node name="TextureRect2" type="TextureRect" parent="Fog/ParallaxLayer"]
+visible = false
+material = SubResource("ShaderMaterial_ubcsx")
+offset_right = 1024.0
+offset_bottom = 1024.0
+texture = SubResource("NoiseTexture2D_r8eh6")
+stretch_mode = 1
+
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 script = ExtResource("2_fjqgb")
 
-[node name="Creature" parent="." instance=ExtResource("3_3mpj2")]
-z_index = 1
-position = Vector2(22.7034, 22.7034)
-
 [node name="World" parent="." instance=ExtResource("4_m24gn")]
 
-[node name="Sun" type="DirectionalLight2D" parent="."]
-rotation = 2.12749
-shadow_enabled = true
-shadow_filter_smooth = 2.5
-
-[node name="Food" type="Node2D" parent="."]
-position = Vector2(0, -1.14441)
-script = ExtResource("5_vt1q3")
-
-[node name="Sprite2D" type="Sprite2D" parent="Food"]
-texture = ExtResource("6_v54j6")
-region_enabled = true
-region_rect = Rect2(159, 415, 66, 66)
+[node name="Creature" parent="." instance=ExtResource("3_3mpj2")]
+z_index = 1
+position = Vector2(-22.7129, -5.67585)
