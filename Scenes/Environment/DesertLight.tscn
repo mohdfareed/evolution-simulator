@@ -2,22 +2,20 @@
 
 [ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Shaders/Tileset.png" id="1_jn1ff"]
 
-[sub_resource type="Gradient" id="Gradient_l322w"]
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_ubrqs"]
-gradient = SubResource("Gradient_l322w")
-width = 256
-height = 256
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(0.85, 0.15)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xk71p"]
 size = Vector2(128, 128)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_nfdbg"]
 polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)
+
+[sub_resource type="Gradient" id="Gradient_7cn5a"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_u7bm5"]
+gradient = SubResource("Gradient_7cn5a")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.85, 0.15)
 
 [node name="DesertLight" type="Node2D"]
 
@@ -26,10 +24,6 @@ texture = ExtResource("1_jn1ff")
 region_enabled = true
 region_rect = Rect2(1408, 128, 128, 128)
 
-[node name="PointLight2D" type="PointLight2D" parent="."]
-texture = SubResource("GradientTexture2D_ubrqs")
-texture_scale = 3.5
-
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
@@ -37,3 +31,8 @@ shape = SubResource("RectangleShape2D_xk71p")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="."]
 occluder = SubResource("OccluderPolygon2D_nfdbg")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+energy = 0.5
+texture = SubResource("GradientTexture2D_u7bm5")
+texture_scale = 25.0

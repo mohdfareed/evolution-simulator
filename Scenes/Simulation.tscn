@@ -18,8 +18,10 @@ script = ExtResource("1_o7r1h")
 environment = SubResource("Environment_usjow")
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+light_mask = 0
+visibility_layer = 0
 color = Color(0, 0, 0, 1)
-energy = 0.5
+energy = 0.95
 blend_mode = 2
 height = 1.0
 
@@ -31,4 +33,4 @@ script = ExtResource("2_fjqgb")
 
 [node name="Creature" parent="." instance=ExtResource("3_3mpj2")]
 z_index = 1
-position = Vector2(-1.96317e-06, -22.7034)
+position = Vector2(-22.7099, 5.67585)
