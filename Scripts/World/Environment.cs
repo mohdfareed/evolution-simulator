@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 namespace Scripts.World;
@@ -6,48 +7,55 @@ namespace Scripts.World;
 [GlobalClass]
 public partial class Environment : TileMap
 {
-    [Export] public Vector2I InitialMapSize = new(64, 64);
-    [Export] public BiomeGenerator BiomeGenerator = new();
-    [Export] public WorldGenerator?[] Generators = Array.Empty<WorldGenerator>();
+    [Export] public BiomeGenerator? BiomeGenerator = new();
+    [Export] public TerrainGenerator?[] Generators = Array.Empty<TerrainGenerator>();
 
-    private Godot.Collections.Dictionary<Vector2I, Biome> _biomeMap = new();
+    public Vector2I CellSize => TileSet.TileSize;
+
+    private readonly Dictionary<Vector2I, Biome> _biomeMap = new();
+
+    public Biome GenerateCell(Vector2I position, bool overwrite = false)
+    {
+        if (!overwrite && _biomeMap.TryGetValue(position, out var biome) && biome != Biome.None)
+            return Biome.None;  // return if not overwriting and a biome already exists
+        // generate biome
+        _biomeMap[position] = BiomeGenerator?.GenerateAt(position, this) ?? Biome.None;
+        // generate world based on biome
+        foreach (var generator in Generators)
+            generator?.GenerateAt(position, _biomeMap[position], this);
+        return _biomeMap[position];
+    }
+
+    public Vector2I GlobalToMap(Vector2 position)
+    {
+        return LocalToMap(ToLocal(position));
+    }
+
+    public Vector2 MapToGlobal(Vector2I mapPosition)
+    {
+        return ToGlobal(MapToLocal(mapPosition));
+    }
+
+    public Vector2 MapToGlobalCorner(Vector2I mapPosition)
+    {
+        return ToGlobal(MapToLocal(mapPosition + (CellSize / 2)));
+    }
+
+    public Biome GetBiome(Vector2I position)
+    {
+        return _biomeMap.TryGetValue(position, out var biome) ? biome : Biome.None;
+    }
+
+    public bool IsSurfaceEmpty(Vector2I position)
+    {
+        return GetCellTileData((int)EnvironmentLayer.Surface, position) is null;
+    }
 
     public override void _Ready()
     {
-        // initialize environment
-        Initialize();
-        BiomeGenerator.Initialize();
-        foreach (var generator in Generators)
-            generator?.Initialize(BiomeGenerator.Noise);
+        TileSet ??= new TileSet();
+        BiomeGenerator ??= new BiomeGenerator();
 
-        // generate world
-        Clear(); GenerateInitialWorld(Vector2I.Zero, InitialMapSize);
-    }
-
-    private void GenerateInitialWorld(Vector2I position, Vector2I size)
-    {
-        for (int x = -size.X / 2; x < size.X / 2; x++)
-        {
-            for (int y = -size.Y / 2; y < size.Y / 2; y++)
-            {
-                // generate biome
-                var tilePosition = new Vector2I(position.X + x, position.Y + y);
-                _biomeMap[tilePosition] = BiomeGenerator.GenerateAt(tilePosition, this);
-
-                // generate world based on biome
-                foreach (var generator in Generators)
-                    generator?.GenerateAt(tilePosition, _biomeMap[tilePosition], this);
-            }
-        }
-    }
-
-    private Vector2I GlobalToMap(Vector2 globalPosition)
-    {
-        return LocalToMap(ToLocal(globalPosition));
-    }
-
-    private void Initialize()
-    {
         // ensure enough layers exist
         for (int i = GetLayersCount(); i < Enum.GetNames(typeof(EnvironmentLayer)).Length; i++)
             AddLayer(i);
@@ -58,13 +66,24 @@ public partial class Environment : TileMap
             SetLayerZIndex(i, i);
             SetLayerName(i, Enum.GetName(typeof(EnvironmentLayer), i));
         }
+
+        // initialize generators
+        BiomeGenerator?.Initialize();
+        foreach (var generator in Generators)
+            generator?.Initialize();
+        Clear(); // start clean world
     }
 
     public override string[] _GetConfigurationWarnings()
     {
-        var warnings = new System.Collections.Generic.List<string>();
-        foreach (var warning in BiomeGenerator.Warnings(this))
-            warnings.Add(warning);
+        var warnings = new List<string>();
+        if (TileSet is null)
+            warnings.Add("Tileset is null.");
+        if (BiomeGenerator is null)
+            warnings.Add("Biome generator is null.");
+        else
+            foreach (var warning in BiomeGenerator.Warnings(this))
+                warnings.Add(warning);
         foreach (var generator in Generators)
             if (generator is null)
                 warnings.Add("Generator is null.");

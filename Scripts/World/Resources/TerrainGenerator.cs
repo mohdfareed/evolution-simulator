@@ -5,33 +5,23 @@ using Godot;
 namespace Scripts.World;
 [Tool]
 [GlobalClass]
-public partial class WorldGenerator : Resource
+public partial class TerrainGenerator : Resource
 {
     [Export] public FastNoiseLite? Noise = new(); // use biome noise if null
-    [Export] public GenerationSettings?[] Specs = Array.Empty<GenerationSettings>();
+    [Export] public TerrainSettings?[] Specs = Array.Empty<TerrainSettings>();
 
-    private FastNoiseLite? biomeNoise;
-
-    public void Initialize(FastNoiseLite biomeNoise)
+    public void Initialize()
     {
         if (Noise is not null)
             Noise.Seed = (int)GD.Randi();
-        else
-            this.biomeNoise = biomeNoise;
     }
 
     public void GenerateAt(Vector2I position, Biome biome, TileMap tileMap)
     {
-        float noise;
-        if (Noise is not null)
-            noise = Noise.GetNoise2D(position.X, position.Y);
-        else if (biomeNoise is not null)
-            noise = biomeNoise.GetNoise2D(position.X, position.Y);
-        else
-        {
-            GD.PrintErr($"{this}: No noise provided.");
+        // get normalized noise value
+        var value = Noise?.GetNoise2D(position.X, position.Y);
+        if (value is not float noise)
             return;
-        }
 
         foreach (var spec in Specs)
             spec?.GenerateAt(noise, biome, position, tileMap);
@@ -39,7 +29,7 @@ public partial class WorldGenerator : Resource
 
     public IEnumerable<string> Warnings(TileMap tilemap)
     {
-        if (Noise is null && biomeNoise is null)
+        if (Noise is null)
             yield return $"{this}: No noise provided.";
         foreach (var spec in Specs)
             if (spec is null)

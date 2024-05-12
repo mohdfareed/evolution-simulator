@@ -8,7 +8,9 @@ public partial class BiomeSettings : Resource
 {
     [Export(PropertyHint.Range, "-1,1,")]
     public float Limit { get; set; } = 0;// noise limit to generate
+    [Export] public EnvironmentLayer Layer { get; set; } = EnvironmentLayer.Ground; // tilemap layer index
     [Export] public WorldResource? Resource { get; set; }
+
 
     public bool GenerateAt(float value, Vector2I position, EnvironmentLayer layer, TileMap tilemap)
     {

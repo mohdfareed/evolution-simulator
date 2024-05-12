@@ -4,7 +4,7 @@ using Godot;
 namespace Scripts.World;
 [Tool]
 [GlobalClass]
-public partial class GenerationSettings : Resource
+public partial class TerrainSettings : Resource
 {
     [Export(PropertyHint.Range, "-1,1,")]
     public float Min { get; set; } = 0;// min noise value

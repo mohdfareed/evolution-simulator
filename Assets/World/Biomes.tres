@@ -1,0 +1,65 @@
+[gd_resource type="Resource" script_class="BiomeGenerator" load_steps=13 format=3 uid="uid://dhh33a1g3tw7m"]
+
+[ext_resource type="Script" path="res://Scripts/World/Resources/TileResource.cs" id="1_lyosx"]
+[ext_resource type="Script" path="res://Scripts/World/Resources/BiomeSettings.cs" id="2_ip4df"]
+[ext_resource type="Script" path="res://Scripts/World/Resources/BiomeGenerator.cs" id="3_pewpk"]
+
+[sub_resource type="Resource" id="Resource_y4xxg"]
+script = ExtResource("1_lyosx")
+Source = 0
+Coordinates = Vector2i(12, 6)
+Alternate = 0
+
+[sub_resource type="Resource" id="Resource_uah0w"]
+script = ExtResource("2_ip4df")
+Limit = -0.15
+Layer = 0
+Resource = SubResource("Resource_y4xxg")
+
+[sub_resource type="Resource" id="Resource_g4reg"]
+script = ExtResource("1_lyosx")
+Source = 0
+Coordinates = Vector2i(10, 6)
+Alternate = 0
+
+[sub_resource type="Resource" id="Resource_e3waa"]
+script = ExtResource("2_ip4df")
+Limit = 0.35
+Layer = 0
+Resource = SubResource("Resource_g4reg")
+
+[sub_resource type="Resource" id="Resource_lrux3"]
+script = ExtResource("1_lyosx")
+Source = 0
+Coordinates = Vector2i(11, 6)
+Alternate = 0
+
+[sub_resource type="Resource" id="Resource_hpio2"]
+script = ExtResource("2_ip4df")
+Limit = 1.0
+Layer = 0
+Resource = SubResource("Resource_lrux3")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_aqrow"]
+seed = -227461332
+frequency = 0.025
+
+[sub_resource type="Resource" id="Resource_mmmb4"]
+script = ExtResource("1_lyosx")
+Source = 0
+Coordinates = Vector2i(11, 6)
+Alternate = 1
+
+[sub_resource type="Resource" id="Resource_wv46r"]
+script = ExtResource("2_ip4df")
+Limit = -0.25
+Layer = 0
+Resource = SubResource("Resource_mmmb4")
+
+[resource]
+script = ExtResource("3_pewpk")
+Noise = SubResource("FastNoiseLite_aqrow")
+Ocean = [SubResource("Resource_wv46r")]
+Desert = [SubResource("Resource_uah0w")]
+Forest = [SubResource("Resource_e3waa")]
+Mountain = [SubResource("Resource_hpio2")]

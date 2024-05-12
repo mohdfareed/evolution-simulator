@@ -3,7 +3,7 @@ using Godot;
 
 namespace Scripts;
 [GlobalClass]
-public partial class SimulationManager : Node
+public partial class SimulationManager : Node2D
 {
     public Camera Camera { get; private set; } = null!;
     public WorldManager GameWorld { get; private set; } = null!;
@@ -39,4 +39,13 @@ public partial class SimulationManager : Node
             warnings.Add("Camera not found.");
         return warnings.ToArray(); // report any missing components
     }
+}
+
+enum CollisionLayer : uint
+{
+    None = 0,
+    Creature = 1 << 0,
+    World = 1 << 1,
+    Resource = 1 << 2,
+    All = uint.MaxValue
 }

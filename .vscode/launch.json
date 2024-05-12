@@ -9,7 +9,10 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${env:GODOT_PATH}"
+            "program": "${env:GODOT_PATH}",
+            "args": [
+                "--debug-collisions"
+            ]
         },
         {
             "name": "Launch Scene",

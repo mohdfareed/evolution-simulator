@@ -24,7 +24,7 @@ public partial class Creature : CharacterBody2D
     {
         _movementTimer.WaitTime = 1;
         _movementTimer.Autostart = true;
-        _movementTimer.Timeout += MoveRandomly;
+        // _movementTimer.Timeout += MoveRandomly;
         AddChild(_movementTimer);
     }
 
@@ -38,6 +38,13 @@ public partial class Creature : CharacterBody2D
         Velocity = Velocity.Lerp(_velocity, ACCELERATION * (float)delta);
         Rotate(Vector2.Zero.DirectionTo(Velocity).Angle() - GlobalRotation + Mathf.Pi / 2);
         MoveAndSlide();
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        // get input vector
+        var input = Input.GetVector("manual_left", "manual_right", "manual_up", "manual_down");
+        _velocity = input.Normalized() * Speed;
     }
 
     private void MoveRandomly()

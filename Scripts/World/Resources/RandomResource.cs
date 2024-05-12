@@ -8,22 +8,21 @@ namespace Scripts.World;
 public partial class RandomResource : WorldResource
 {
     [Export] public WorldResource?[] Resources { get; set; } = Array.Empty<WorldResource>();
-    [Export] public float[] Weights { get; set; } = Array.Empty<float>();
+    [Export] public float[] Weights = Array.Empty<float>();
 
+    private float total = 0;
+
+    public RandomResource()
+    {
+        if (Resources.Length != Weights.Length)
+            Array.Resize(ref Weights, Resources.Length);
+
+        foreach (var weight in Weights)
+            total += weight;
+    }
 
     public override void GenerateAt(Vector2I position, EnvironmentLayer layer, TileMap tilemap)
     {
-        if (Resources.Length == 0)
-            return;
-        if (Resources.Length != Weights.Length)
-            return;
-
-        var total = 0f;
-        foreach (var weight in Weights)
-            total += weight;
-        if (total <= 0)
-            return;
-
         var random = GD.Randf();
         for (var i = 0; i < Resources.Length; i++)
         {

@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://dfg3rv7iqqxfd"]
 
-[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Tileset.png" id="2_c5krm"]
+[ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Shaders/Tileset.png" id="2_c5krm"]
 [ext_resource type="Texture2D" uid="uid://ciljj6dh258le" path="res://Assets/Light.png" id="3_13uhh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o81yh"]
