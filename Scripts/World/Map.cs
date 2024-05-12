@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Godot;
 
 namespace EvolutionSimulator.World;
@@ -12,23 +13,28 @@ public partial class Map : Node2D
     [Export] public Vector2I ChunkSize = new(8, 8); // size of a chunk in tiles
     [Export] public CellResource? BordersResource = null!;
     [Signal] public delegate void WorldBoundsReachedEventHandler(Vector2I cell);
+    private Node2D _boundsEffectResource = null!;
+    private BorderEffect _boundsEffect = null!;
     private bool _isOnCooldown = false;
 
-    public void ExpandMap(IEnumerable<Vector2I> generatedCells, Func<Vector2I, Cell?> _environment)
+    public void ExpandMap(IEnumerable<Vector2I> generatedCells, Environment environment)
     {
         // find world borders
         foreach (var cellCoord in generatedCells)
         {
-            if (_environment(cellCoord) is not Cell cell)
+            if (environment[cellCoord] is not Cell cell)
                 continue; // skip if cell is not found
 
             // unsubscribe from previous events
+            cell.RemoveEffect(_boundsEffect);
             cell.Entered -= OnWorldBoundsReached;
             currentBounds.Remove(cell.Coord);
 
             // subscribe to world bounds
-            if (IsCellWorldBound(cell, _environment))
+            if (IsCellWorldBound(cell, environment.GetCell))
             {
+                _boundsEffect.MapToGlobal = (coord) => environment.MapToGlobal(coord);
+                cell.AddEffect(_boundsEffect);
                 cell.Entered += OnWorldBoundsReached;
                 currentBounds.Add(cell.Coord);
             }
@@ -59,6 +65,25 @@ public partial class Map : Node2D
         _isOnCooldown = false;
     }
 
+    private void Initialize()
+    {
+        foreach (var child in GetChildren())
+        {
+            if (child is Node2D boundsEffect)
+                _boundsEffectResource = boundsEffect;
+        }
+    }
+
+    public override void _Ready()
+    {
+        Initialize(); // initialize environment
+        _boundsEffect = new()
+        {
+            BoundsEffect = _boundsEffectResource,
+        };
+        _boundsEffectResource.Visible = false;
+    }
+
     private List<Vector2I> currentBounds = new();
     public override void _Process(double _) => QueueRedraw();
     public override void _Draw()
@@ -73,6 +98,7 @@ public partial class Map : Node2D
 
     public override string[] _GetConfigurationWarnings()
     {
+        Initialize(); // initialize environment
         var warnings = new List<string>();
         if (ExpansionCoolDown <= 0)
             warnings.Add("Expansion cooldown is not valid.");
@@ -82,21 +108,28 @@ public partial class Map : Node2D
 
 public class BorderEffect : ICellEffect
 {
-    public CellResource? Resource { get; set; }
-    public Environment? Environment { get; set; } = null;
-    private Dictionary<Cell, float> _resources = new();
+    public Node2D? BoundsEffect { get; set; }
+    public Func<Vector2I, Vector2> MapToGlobal { get; set; } = (coord) => Vector2.Zero;
+    private readonly Dictionary<Cell, Tuple<Node2D?, float>> _resources = new();
 
     public void Apply(Cell cell)
     {
-        _resources[cell] = cell.Resources;
+        // create bounds effect
+        var effectInstance = BoundsEffect?.Duplicate() as Node2D;
+        if (effectInstance is not null)
+        {
+            effectInstance.GlobalPosition = MapToGlobal(cell.Coord);
+            BoundsEffect?.GetParent().AddChild(effectInstance);
+            effectInstance.Visible = true;
+        }
+        _resources[cell] = new(effectInstance, cell.Resources);
         cell.Resources = 0;
-        if (Resource is not null && Environment is not null)
-            Resource?.GenerateAt(cell.Coord, cell.Layer, Environment);
     }
 
     public void Remove(Cell cell)
     {
-        cell.Resources = _resources[cell];
+        cell.Resources = _resources[cell].Item2;
+        _resources[cell].Item1?.QueueFree();
         _resources.Remove(cell);
     }
 }

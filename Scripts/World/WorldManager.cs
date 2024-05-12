@@ -15,7 +15,7 @@ public partial class WorldManager : Node2D
 
     public void GenerateWorld(Vector2I position, Vector2I size)
     {
-        _map.ExpandMap(Environment.Generate(position, size).ToArray(), Environment.GetCell);
+        _map.ExpandMap(Environment.Generate(position, size).ToArray(), Environment);
     }
 
     private void Initialize()

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Godot;
 
 namespace EvolutionSimulator.World;
-public partial class Cell : RefCounted
+public partial class Cell : Resource
 {
     // properties
     public Vector2I Coord { get; set; } // map coordinates
