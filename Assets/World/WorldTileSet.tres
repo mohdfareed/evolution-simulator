@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=53 format=3 uid="uid://b4jatjgm32yjm"]
 
 [ext_resource type="Shader" path="res://Scripts/Shaders/Water.gdshader" id="1_yv4tj"]
-[ext_resource type="Shader" uid="uid://h2vv27kgph6t" path="res://Assets/WaterShader.tres" id="2_p44uo"]
+[ext_resource type="Shader" uid="uid://h2vv27kgph6t" path="res://Assets/Shaders/WaterShader.tres" id="2_p44uo"]
 [ext_resource type="Texture2D" uid="uid://coy8jugfebh53" path="res://Assets/Shaders/Tileset.png" id="3_iq8a0"]
 [ext_resource type="PackedScene" uid="uid://chbq2bruxr6lu" path="res://Scenes/Environment/OceanLight.tscn" id="4_7s6lv"]
 [ext_resource type="PackedScene" uid="uid://doagob478ofgl" path="res://Scenes/Environment/DesertLight.tscn" id="5_cl42g"]

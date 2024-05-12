@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Scripts;
+namespace EvolutionSimulator;
 [Tool]
 [GlobalClass]
 public partial class Creature : CharacterBody2D

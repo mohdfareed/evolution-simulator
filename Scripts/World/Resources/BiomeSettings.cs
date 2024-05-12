@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class BiomeSettings : Resource
+public partial class BiomeSettings : Godot.Resource
 {
     [Export(PropertyHint.Range, "-1,1,")]
     public float Limit { get; set; } = 0;// noise limit to generate

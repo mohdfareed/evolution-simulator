@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using Scripts.World;
+using EvolutionSimulator.World;
 
-namespace Scripts;
+namespace EvolutionSimulator;
 [Tool]
 [GlobalClass]
 public partial class WorldManager : Node2D

@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Scripts;
+namespace EvolutionSimulator;
 
 /// <summary>
 /// 2D camera that follows a target node and allows zooming and panning. It

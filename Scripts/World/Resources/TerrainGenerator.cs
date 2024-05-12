@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class TerrainGenerator : Resource
+public partial class TerrainGenerator : Godot.Resource
 {
     [Export] public FastNoiseLite? Noise = new(); // use biome noise if null
     [Export] public TerrainSettings?[] Specs = Array.Empty<TerrainSettings>();

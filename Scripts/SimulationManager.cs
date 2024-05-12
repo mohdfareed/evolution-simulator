@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts;
+namespace EvolutionSimulator;
 [GlobalClass]
 public partial class SimulationManager : Node2D
 {

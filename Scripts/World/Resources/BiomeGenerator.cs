@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class BiomeGenerator : Resource
+public partial class BiomeGenerator : Godot.Resource
 {
     [Export] public FastNoiseLite? Noise = new();
     [ExportGroup("Biome Definitions")]

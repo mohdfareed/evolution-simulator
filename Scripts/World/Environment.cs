@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
 public partial class Environment : TileMap
@@ -92,15 +92,6 @@ public partial class Environment : TileMap
                     warnings.Add(warning);
         return warnings.ToArray();
     }
-}
-
-public enum Biome // 4 basic biomes
-{
-    Ocean, // cold, wet, water
-    Desert, // hot, dry, sandy
-    Forest, // hot, wet, green
-    Mountain, // cold, dry, rocky
-    None // biome agnostic
 }
 
 public enum EnvironmentLayer

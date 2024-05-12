@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
 public partial class RandomResource : WorldResource

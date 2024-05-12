@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace Scripts.World;
+namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class TerrainSettings : Resource
+public partial class TerrainSettings : Godot.Resource
 {
     [Export(PropertyHint.Range, "-1,1,")]
     public float Min { get; set; } = 0;// min noise value
