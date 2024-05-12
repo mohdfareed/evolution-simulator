@@ -18,6 +18,8 @@ operator = 7
 frequency = 0.0061
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_1k7pj"]
+width = 2048
+height = 2048
 seamless = true
 noise = SubResource("FastNoiseLite_a71gv")
 

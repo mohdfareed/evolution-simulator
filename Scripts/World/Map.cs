@@ -28,7 +28,6 @@ public partial class Map : Node2D
             // unsubscribe from previous events
             cell.RemoveEffect(_boundsEffect);
             cell.Entered -= OnWorldBoundsReached;
-            currentBounds.Remove(cell.Coord);
 
             // subscribe to world bounds
             if (IsCellWorldBound(cell, environment.GetCell))
@@ -36,7 +35,6 @@ public partial class Map : Node2D
                 _boundsEffect.MapToGlobal = (coord) => environment.MapToGlobal(coord);
                 cell.AddEffect(_boundsEffect);
                 cell.Entered += OnWorldBoundsReached;
-                currentBounds.Add(cell.Coord);
             }
         }
     }
@@ -82,18 +80,6 @@ public partial class Map : Node2D
             BoundsEffect = _boundsEffectResource,
         };
         _boundsEffectResource.Visible = false;
-    }
-
-    private List<Vector2I> currentBounds = new();
-    public override void _Process(double _) => QueueRedraw();
-    public override void _Draw()
-    {
-        // clear previous bounds
-        foreach (var cell in currentBounds)
-            DrawRect(new Rect2(cell * 128, Vector2.One * 128), new Color(0, 0, 0, 0));
-        // draw squares 128x128 for each point
-        foreach (var cell in currentBounds)
-            DrawRect(new Rect2(cell * 128, Vector2.One * 128), new Color(1, 0, 0.25f, 0.5f));
     }
 
     public override string[] _GetConfigurationWarnings()

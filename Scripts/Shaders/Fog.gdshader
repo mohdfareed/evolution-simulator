@@ -8,7 +8,7 @@ uniform float fade_margin = 0.15; // fog fade margin
 
 void fragment() {
     // sample noise with distortion
-    vec2 noise_uv = UV + speed * TIME;
+    vec2 noise_uv = SCREEN_UV + speed * TIME;
     vec3 noise_value = texture(noise, noise_uv).rgb;
 
     // get least distance from the edge of the screen
