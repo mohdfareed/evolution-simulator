@@ -17,14 +17,18 @@ script = ExtResource("1_o7r1h")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_usjow")
 
+[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+color = Color(0, 0, 0, 1)
+energy = 0.5
+blend_mode = 2
+height = 1.0
+
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 script = ExtResource("2_fjqgb")
 
 [node name="World" parent="." instance=ExtResource("4_m24gn")]
-visible = false
 
 [node name="Creature" parent="." instance=ExtResource("3_3mpj2")]
 z_index = 1
-
-[node name="NewWorld" type="Node2D" parent="."]
+position = Vector2(-1.96317e-06, -22.7034)

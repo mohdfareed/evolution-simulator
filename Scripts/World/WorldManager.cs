@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using EvolutionSimulator.World;
+using System.Linq;
 
 namespace EvolutionSimulator;
 [Tool]
@@ -8,47 +9,34 @@ namespace EvolutionSimulator;
 public partial class WorldManager : Node2D
 {
     [Export] public int DayLength = 120; // length of a day in seconds
-    [Export] public Vector2I WorldSize = new(32, 32); // initial world size
-    [Export] public Vector2I ChunkSize = new(8, 8); // size of a chunk in tiles
-
-    private World.Environment _environment = null!;
+    public World.Environment Environment { get; private set; } = null!;
     private Map _map = null!;
     private DirectionalLight2D _sun = null!;
 
-    private void GenerateWorld(Vector2I position, Vector2I size)
+    public void GenerateWorld(Vector2I position, Vector2I size)
     {
-        // generate biome
-        var biomeMap = new Dictionary<Vector2I, Biome>();
-        for (int x = position.X - size.X / 2; x < position.X + size.X / 2; x++)
-            for (int y = position.Y - size.Y / 2; y < position.Y + size.Y / 2; y++)
-            {
-                var mapPosition = new Vector2I(x, y);
-                var biome = _environment.GenerateCell(mapPosition);
-                biomeMap[mapPosition] = biome;
-            }
-
-        // generate map
-        _map.ExpandMap(biomeMap, _environment.MapToGlobalCorner);
+        _map.ExpandMap(Environment.Generate(position, size).ToArray(), Environment.GetCell);
     }
 
-    public override void _Ready()
+    private void Initialize()
     {
-        for (int i = 0; i < GetChildCount(); i++)
+        foreach (var child in GetChildren())
         {
-            Node child = GetChild(i);
             if (child is World.Environment environment)
-                _environment = environment;
+                Environment = environment;
             if (child is DirectionalLight2D sun)
                 _sun = sun;
             if (child is Map map)
                 _map = map;
         }
+    }
 
-        // connect to map expansion
-        _map.WorldBoundsReached += (body) =>
-            GenerateWorld(_environment.GlobalToMap(body.GlobalPosition), ChunkSize);
-        // generate initial world
-        GenerateWorld(Vector2I.Zero, WorldSize);
+    public override void _Ready()
+    {
+        Initialize(); // initialize nodes
+        // expand map when world bounds reached
+        _map.WorldBoundsReached += (cell) => GenerateWorld(cell, _map.ChunkSize);
+        GenerateWorld(Vector2I.Zero, Environment.WorldSize); // generate initial world
     }
 
     public override void _Process(double delta)
@@ -62,16 +50,17 @@ public partial class WorldManager : Node2D
     {
         if (Input.IsActionJustPressed("select"))
         {
-            var position = _environment.GlobalToMap(GetGlobalMousePosition());
-            if (_environment.GetBiome(position) == Biome.None)
-                GenerateWorld(position, ChunkSize);
+            var position = Environment.GlobalToMap(GetGlobalMousePosition());
+            if (Environment.GetCell(position) is null)
+                GenerateWorld(position, _map.ChunkSize);
         }
     }
 
     public override string[] _GetConfigurationWarnings()
     {
+        Initialize(); // initialize environment
         var warnings = new List<string>();
-        if (_environment is null)
+        if (Environment is null)
             warnings.Add($"Environment node not found: {nameof(World.Environment)}");
         if (_map is null)
             warnings.Add($"Map node not found: {nameof(Map)}");

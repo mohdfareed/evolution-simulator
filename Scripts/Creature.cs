@@ -11,8 +11,15 @@ public partial class Creature : CharacterBody2D
     public const float ACCELERATION = 1.5f;
     public const float STOPPING_DISTANCE = 0.1f;
 
+    private World.Environment? _environment;
+    private World.Cell? _currentCell;
     private Vector2 _velocity = Vector2.Zero;
     private Timer _movementTimer = new();
+
+    public void Initialize(World.Environment environment)
+    {
+        _environment = environment;
+    }
 
     public override void _InputEvent(Viewport viewport, InputEvent @event, int shapeIdx)
     {
@@ -22,10 +29,25 @@ public partial class Creature : CharacterBody2D
 
     public override void _Ready()
     {
+        _currentCell = _environment?.GetCell(_environment?.GlobalToMap(GlobalPosition) ?? Vector2I.Zero);
+
+        // setup random movement timer
         _movementTimer.WaitTime = 1;
         _movementTimer.Autostart = true;
         // _movementTimer.Timeout += MoveRandomly;
         AddChild(_movementTimer);
+    }
+
+    public override void _Process(double delta)
+    {
+        // check if current cell has changed
+        var newCell = _environment?.GetCell(_environment?.GlobalToMap(GlobalPosition) ?? Vector2I.Zero);
+        if (_currentCell != newCell)
+        {
+            _currentCell?.Exit(this);
+            _currentCell = newCell;
+            _currentCell?.Enter(this);
+        }
     }
 
     public override void _PhysicsProcess(double delta)

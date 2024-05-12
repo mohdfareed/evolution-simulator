@@ -7,7 +7,7 @@ public partial class SimulationManager : Node2D
 {
     public Camera Camera { get; private set; } = null!;
     public WorldManager GameWorld { get; private set; } = null!;
-    public Godot.Collections.Array<Creature> Creatures { get; } = new Godot.Collections.Array<Creature>();
+    public List<Creature> Creatures { get; } = new();
 
     public override void _Ready()
     {
@@ -23,9 +23,13 @@ public partial class SimulationManager : Node2D
                 Creatures.Add(creature);
         }
 
-        // register camera follow to creatures
+        // initialize creatures
         foreach (var creature in Creatures)
+        {
+            creature.Initialize(GameWorld.Environment);
+            // register camera follow to creatures
             creature.Selected += (creature) => Camera?.FollowTarget(creature);
+        }
         Camera?.MakeCurrent();
     }
 

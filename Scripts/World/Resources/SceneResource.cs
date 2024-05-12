@@ -4,7 +4,7 @@ using Godot;
 namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class SceneResource : WorldResource
+public partial class SceneResource : CellResource
 {
     [Export] public int Source { get; set; } = 0; // tileset source index
     [Export] public int ID { get; set; } = 0; // tile index
@@ -21,18 +21,13 @@ public partial class SceneResource : WorldResource
         }
     }
 
-    public override IEnumerable<string> Warnings(TileMap tilemap)
+    public override IEnumerable<string> Warnings(TileSet tileset)
     {
-        if (tilemap is null)
-            yield break;
-        if (tilemap.TileSet.GetSource(Source) is not TileSetScenesCollectionSource source)
-        {
+        if (tileset.GetSource(Source) is not TileSetScenesCollectionSource source)
             yield return $"{this}: Source is not a tileset scene source.";
-            yield break;
-        }
-        if (!source.HasSceneTileId(ID))
-        {
+        else if (!source.HasSceneTileId(ID))
             yield return $"{this}: Tile does not exist in the tileset.";
-        }
+        foreach (var warning in base.Warnings(tileset))
+            yield return warning;
     }
 }

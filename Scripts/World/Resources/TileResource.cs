@@ -4,7 +4,7 @@ using Godot;
 namespace EvolutionSimulator.World;
 [Tool]
 [GlobalClass]
-public partial class TileResource : WorldResource
+public partial class TileResource : CellResource
 {
     [Export] public int Source { get; set; } = 0; // tileset source index
     [Export] public Vector2I Coordinates { get; set; } = Vector2I.Zero; // tile coordinates
@@ -22,11 +22,9 @@ public partial class TileResource : WorldResource
         }
     }
 
-    public override IEnumerable<string> Warnings(TileMap tilemap)
+    public override IEnumerable<string> Warnings(TileSet tileset)
     {
-        if (tilemap is null)
-            yield break;
-        if (tilemap.TileSet.GetSource(Source) is not TileSetAtlasSource source)
+        if (tileset.GetSource(Source) is not TileSetAtlasSource source)
         {
             yield return $"{this}: Source is not a tileset atlas source.";
             yield break;
@@ -35,5 +33,7 @@ public partial class TileResource : WorldResource
             yield return $"{this}: Tile does not exist in the tileset.";
         if (!source.HasAlternativeTile(Coordinates, Alternate))
             yield return $"{this}: Alternate tile does not exist in the tileset.";
+        foreach (var warning in base.Warnings(tileset))
+            yield return warning;
     }
 }

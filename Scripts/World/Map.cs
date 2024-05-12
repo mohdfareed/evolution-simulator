@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 namespace EvolutionSimulator.World;
@@ -9,274 +8,95 @@ namespace EvolutionSimulator.World;
 public partial class Map : Node2D
 {
     [Export] public int WorldBoundaryMargin = 4; // in tiles
+    [Export] public float ExpansionCoolDown = 2.5f; // in seconds
+    [Export] public Vector2I ChunkSize = new(8, 8); // size of a chunk in tiles
+    [Export] public CellResource? BordersResource = null!;
+    [Signal] public delegate void WorldBoundsReachedEventHandler(Vector2I cell);
+    private bool _isOnCooldown = false;
 
-    [Signal] public delegate void WorldBoundsReachedEventHandler(Node2D body);
-    [Signal] public delegate void BiomeChangedEventHandler(Biome biome, Node2D body);
-
-    private Area2D _worldMap = null!; // area of the world
-    private Vector2[][] _mapShapes = Array.Empty<Vector2[]>(); // bounds of the world
-    private readonly Dictionary<Biome, Area2D> _biomesAreas = new(); // areas of biomes
-    private Dictionary<Biome, Vector2[][]> _biomesShapes = new(); // bounds of biomes
-
-    public void ExpandMap(Dictionary<Vector2I, Biome> biomeMap, Func<Vector2I, Vector2> mapToGlobal)
+    public void ExpandMap(IEnumerable<Vector2I> generatedCells, Func<Vector2I, Cell?> _environment)
     {
-
-        // // combine all cells for world bounds
-        // var mapBorders = MapBorders(biomeMap, mapToGlobal);
-        // _mapShapes = new Vector2[][]
-        // {
-        //     mapBorders.Select(b =>
-        //     {
-        //         return b.Item1;
-        //     }).ToArray()
-        // };
-        // UpdateArea(_worldMap, _mapShapes);
-    }
-
-    private static List<Tuple<Vector2, Vector2>> MapBorders(Dictionary<Vector2I, Biome> biomeMap, Func<Vector2I, Vector2> mapToGlobal)
-    {
-        // construct borders around world
-        var borders = new List<Tuple<Vector2, Vector2>>();
-        foreach (var coord in biomeMap.Keys)
+        // find world borders
+        foreach (var cellCoord in generatedCells)
         {
-            var cell = new BiomeCell(coord, mapToGlobal, biomeMap[coord]);
-            borders.AddRange(cell.WorldBorder(biomeMap));
-        }
+            if (_environment(cellCoord) is not Cell cell)
+                continue; // skip if cell is not found
 
-        // sort segments to form closed shapes
-        var sorted = new List<Tuple<Vector2, Vector2>>();
-        var current = borders[0];
-        borders.RemoveAt(0);
+            // unsubscribe from previous events
+            cell.Entered -= OnWorldBoundsReached;
+            currentBounds.Remove(cell.Coord);
 
-        while (borders.Count > 0)
-        {
-            var next = borders.FirstOrDefault(b => b.Item1 == current.Item2);
-            if (next is null)
+            // subscribe to world bounds
+            if (IsCellWorldBound(cell, _environment))
             {
-                sorted.Add(current);
-                current = borders[0];
-                borders.RemoveAt(0);
-            }
-            else
-            {
-                borders.Remove(next);
-                if (next.Item1 == current.Item2)
-                    current = new Tuple<Vector2, Vector2>(current.Item1, next.Item2);
-                else
-                    current = new Tuple<Vector2, Vector2>(current.Item2, next.Item1);
+                cell.Entered += OnWorldBoundsReached;
+                currentBounds.Add(cell.Coord);
             }
         }
-
-        GD.Print($"World bounds: {borders.Select(b => $"{b.Item1} - {b.Item2}").ToArray()}");
-        return borders;
     }
 
-    private static Dictionary<Biome, List<Tuple<Vector2, Vector2>>> BiomesBorders(Dictionary<Vector2I, Biome> biomeMap, Func<Vector2I, Vector2> mapToGlobal)
+    private bool IsCellWorldBound(Cell cell, Func<Vector2I, Cell?> _environment)
     {
-        // construct borders around biomes
-        var borders = new Dictionary<Biome, List<Tuple<Vector2, Vector2>>>();
-        foreach (var coord in biomeMap.Keys)
-        {
-            var biome = biomeMap[coord];
-            if (biome == Biome.None)
-                continue;
-            if (!borders.TryGetValue(biome, out var border))
-                borders[biome] = new List<Tuple<Vector2, Vector2>>();
-
-            var cell = new BiomeCell(coord, mapToGlobal, biome);
-            border?.AddRange(cell.Border(biomeMap));
-        }
-
-        // sort segments to form closed shapes
-        foreach (var biome in borders.Keys)
-        {
-            var border = borders[biome];
-            var sorted = new List<Tuple<Vector2, Vector2>>();
-            var current = border[0];
-            border.RemoveAt(0);
-            while (border.Count > 0)
-            {
-                var next = border.FirstOrDefault(b => b.Item1 == current.Item2 || b.Item2 == current.Item2);
-                if (next is null)
-                {
-                    sorted.Add(current);
-                    current = border[0];
-                    border.RemoveAt(0);
-                }
-                else
-                {
-                    border.Remove(next);
-                    if (next.Item1 == current.Item2)
-                        current = new Tuple<Vector2, Vector2>(current.Item1, next.Item2);
-                    else
-                        current = new Tuple<Vector2, Vector2>(current.Item2, next.Item1);
-                }
-            }
-            sorted.Add(current);
-            borders[biome] = sorted;
-        }
-        return borders;
+        for (int i = 0; i < WorldBoundaryMargin; i++) // check each neighbor up to the margin
+            foreach (var neighborCoord in cell.Neighbors(i + 1)) // check all directions for world bounds
+                if (_environment(neighborCoord) is null)
+                    return true; // world bounds neighbor nothing
+        return false;
     }
 
-    private void UpdateArea(Area2D area, Vector2[][] shapes)
+    private async void OnWorldBoundsReached(Cell cell, Node body)
     {
-        // create missing colliders
-        while (area.GetChildCount() < shapes.Length)
-            area.AddChild(new CollisionPolygon2D());
+        if (_isOnCooldown)
+            return;
 
-        // update existing colliders
-        for (int i = 0; i < shapes.Length; i++)
-            if (area.GetChild(i) is CollisionPolygon2D collider)
-                CallDeferred(nameof(SetCollider), collider, shapes[i], $"Shape {i}");
+        // notify world bounds reached
+        EmitSignal(SignalName.WorldBoundsReached, cell.Coord);
 
-        // disable unused colliders
-        for (int i = shapes.Length; i < area.GetChildCount(); i++)
-            if (area.GetChild(i) is CollisionPolygon2D collider)
-                CallDeferred(nameof(ResetCollider), collider);
+        // cooldown expansion
+        var timer = GetTree().CreateTimer(ExpansionCoolDown);
+        _isOnCooldown = true;
+        await ToSignal(timer, SceneTreeTimer.SignalName.Timeout);
+        _isOnCooldown = false;
     }
 
-    private static void SetCollider(CollisionPolygon2D collider, Vector2[] shape, string name)
+    private List<Vector2I> currentBounds = new();
+    public override void _Process(double _) => QueueRedraw();
+    public override void _Draw()
     {
-        collider.BuildMode = CollisionPolygon2D.BuildModeEnum.Segments;
-        collider.Polygon = shape;
-        collider.Disabled = false;
-        collider.Name = name;
-    }
-
-    private static void ResetCollider(CollisionPolygon2D collider)
-    {
-        collider.Polygon = Array.Empty<Vector2>();
-        collider.Disabled = true;
-    }
-
-    public override void _Ready()
-    {
-        // create world area
-        _worldMap = new Area2D()
-        {
-            Name = "Boundaries",
-            Monitorable = false,
-            Monitoring = true,
-            CollisionLayer = (uint)CollisionLayer.None,
-            CollisionMask = (uint)CollisionLayer.Creature,
-        };
-        AddChild(_worldMap);
-        // create preliminary world bounds (to avoid editor warnings)
-        var collider = new CollisionPolygon2D() { Name = "Shape" };
-        _worldMap.AddChild(collider);
-        collider.Owner = GetTree().EditedSceneRoot; // FIXME: not displaying in editor
-
-        // create biome areas
-        foreach (Biome biome in Enum.GetValues(typeof(Biome)))
-        {
-            var area = new Area2D()
-            {
-                Name = biome.ToString(),
-                Monitorable = false,
-                Monitoring = true,
-                CollisionLayer = (uint)CollisionLayer.None,
-                CollisionMask = (uint)CollisionLayer.Creature,
-            };
-            AddChild(area);
-            _biomesAreas[biome] = area;
-            _biomesShapes[biome] = Array.Empty<Vector2[]>();
-            // create biome bounds
-            collider = new CollisionPolygon2D() { Name = "Shape" };
-            area.AddChild(collider);
-            collider.Owner = GetTree().EditedSceneRoot;
-        }
-
-        // connect to world boundary event
-        _worldMap.BodyExited += body => EmitSignal(SignalName.WorldBoundsReached, body);
-        // connect to biome change event
-        foreach (Biome biome in Enum.GetValues(typeof(Biome)))
-            _biomesAreas[biome].BodyEntered += body =>
-                EmitSignal(SignalName.BiomeChanged, (int)biome, body);
+        // clear previous bounds
+        foreach (var cell in currentBounds)
+            DrawRect(new Rect2(cell * 128, Vector2.One * 128), new Color(0, 0, 0, 0));
+        // draw squares 128x128 for each point
+        foreach (var cell in currentBounds)
+            DrawRect(new Rect2(cell * 128, Vector2.One * 128), new Color(1, 0, 0.25f, 0.5f));
     }
 
     public override string[] _GetConfigurationWarnings()
     {
         var warnings = new List<string>();
-        if (_worldMap is null)
-            warnings.Add($"World area not found: {nameof(CollisionPolygon2D)}");
-        foreach (var (biome, area) in _biomesAreas)
-        {
-            if (area is null)
-                warnings.Add($"Biome area not found: {nameof(Area2D)}");
-        }
+        if (ExpansionCoolDown <= 0)
+            warnings.Add("Expansion cooldown is not valid.");
         return warnings.ToArray();
     }
 }
 
-public struct BiomeCell
+public class BorderEffect : ICellEffect
 {
-    public Vector2I Coord;
-    public Func<Vector2I, Vector2> MapToGlobal;
-    public Biome biome;
-    public BiomeCell(Vector2I coord, Func<Vector2I, Vector2> mapToGlobal, Biome biome)
+    public CellResource? Resource { get; set; }
+    public Environment? Environment { get; set; } = null;
+    private Dictionary<Cell, float> _resources = new();
+
+    public void Apply(Cell cell)
     {
-        Coord = coord;
-        MapToGlobal = mapToGlobal;
-        this.biome = biome;
+        _resources[cell] = cell.Resources;
+        cell.Resources = 0;
+        if (Resource is not null && Environment is not null)
+            Resource?.GenerateAt(cell.Coord, cell.Layer, Environment);
     }
 
-    // cells
-    public readonly Vector2I LeftNeighbor => Coord + Vector2I.Left;
-    public readonly Vector2I RightNeighbor => Coord + Vector2I.Right;
-    public readonly Vector2I UpNeighbor => Coord + Vector2I.Up;
-    public readonly Vector2I DownNeighbor => Coord + Vector2I.Down;
-    public readonly Vector2I[] Neighbors => new Vector2I[4] {
-        LeftNeighbor,
-        RightNeighbor,
-        UpNeighbor,
-        DownNeighbor
-    };
-
-
-    public readonly Vector2 TopLeftBound => MapToGlobal(new Vector2I(Coord.X, Coord.Y));
-    public readonly Vector2 TopRightBound => MapToGlobal(new Vector2I(Coord.X + 1, Coord.Y));
-    public readonly Vector2 BottomRightBound => MapToGlobal(new Vector2I(Coord.X + 1, Coord.Y + 1));
-    public readonly Vector2 BottomLeftBound => MapToGlobal(new Vector2I(Coord.X, Coord.Y + 1));
-
-    public readonly Vector2[] Bounds => new Vector2[4] {
-        TopLeftBound,
-        TopRightBound,
-        BottomRightBound,
-        BottomLeftBound
-    };
-
-    public Tuple<Vector2, Vector2> LeftEdge => new(TopLeftBound, BottomLeftBound);
-    public Tuple<Vector2, Vector2> RightEdge => new(TopRightBound, BottomRightBound);
-    public Tuple<Vector2, Vector2> TopEdge => new(TopLeftBound, TopRightBound);
-    public Tuple<Vector2, Vector2> BottomEdge => new(BottomLeftBound, BottomRightBound);
-
-    public Tuple<Vector2, Vector2>[] Border(Dictionary<Vector2I, Biome> bioMap)
+    public void Remove(Cell cell)
     {
-        // create borders around biomes
-        var borders = new List<Tuple<Vector2, Vector2>>();
-        if (!bioMap.TryGetValue(LeftNeighbor, out var left) || left != biome)
-            borders.Add(LeftEdge);
-        if (!bioMap.TryGetValue(RightNeighbor, out var right) || right != biome)
-            borders.Add(RightEdge);
-        if (!bioMap.TryGetValue(UpNeighbor, out var up) || up != biome)
-            borders.Add(TopEdge);
-        if (!bioMap.TryGetValue(DownNeighbor, out var down) || down != biome)
-            borders.Add(BottomEdge);
-        return borders.ToArray();
-    }
-
-    public Tuple<Vector2, Vector2>[] WorldBorder(Dictionary<Vector2I, Biome> bioMap)
-    {
-        // create borders around world
-        var borders = new List<Tuple<Vector2, Vector2>>();
-        if (!bioMap.TryGetValue(LeftNeighbor, out var left) || left == Biome.None)
-            borders.Add(LeftEdge);
-        if (!bioMap.TryGetValue(RightNeighbor, out var right) || right == Biome.None)
-            borders.Add(RightEdge);
-        if (!bioMap.TryGetValue(UpNeighbor, out var up) || up == Biome.None)
-            borders.Add(TopEdge);
-        if (!bioMap.TryGetValue(DownNeighbor, out var down) || down == Biome.None)
-            borders.Add(BottomEdge);
-        return borders.ToArray();
+        cell.Resources = _resources[cell];
+        _resources.Remove(cell);
     }
 }
